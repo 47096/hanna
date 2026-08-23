@@ -1084,7 +1084,7 @@
         [data-read-aloud] .vc-pill { background: #0a0a0a; border: 1px solid #333; border-radius: 20px; padding: 6px 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 8px; cursor: grab; user-select: none; transition: box-shadow 0.15s; }
         [data-read-aloud] .vc-pill:hover { border-color: #555; }
         [data-read-aloud] .vc-pill.vc-dragging { cursor: grabbing; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-color: #555; }
-        [data-read-aloud] .vc-status { font-size: 11px; font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 400; cursor: pointer; }
+        [data-read-aloud] .vc-status { font-size: 11px; font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 400; cursor: pointer; font-variant-numeric: tabular-nums; min-width: 64px; text-align: left; }
         [data-read-aloud] .vc-status-rainbow {
           background: linear-gradient(90deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff0088, #ff0000);
           background-size: 200% 100%;
