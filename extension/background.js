@@ -119,9 +119,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (settings.mimoApiKey) providersWithKeys.push('mimo');
         if (settings.fishApiKey) providersWithKeys.push('fish');
         if (settings.elevenlabsApiKey) providersWithKeys.push('elevenlabs');
-        sendResponse({ providersWithKeys });
+        sendResponse({ providersWithKeys, currentProvider: settings.provider || DEFAULT_PROVIDER });
       } catch (err) {
-        sendResponse({ providersWithKeys: [] });
+        sendResponse({ providersWithKeys: [], currentProvider: DEFAULT_PROVIDER });
       }
     })();
     return true;

@@ -532,13 +532,13 @@
   let prefetchMap = new Map();   // index → { index, audioBase64, mimeType } | { failed: true }
   let prefetchInFlight = new Set();
 
-  // Ask background which providers have API keys, then pick the first one
-  // that isn't the current provider
+  // Ask background which providers have API keys (and who the current primary
+  // is), then pick the first candidate that isn't the provider being used
   function attemptFailover() {
     return new Promise((resolve) => {
       const proceed = () => {
-        const primary = failoverProvider || 'mimo'; // approximate current; refine below
-        const candidates = providersWithKeys.filter((p) => p !== readPageState.currentProvider);
+        const activeProvider = readPageState.currentProvider || 'mimo';
+        const candidates = providersWithKeys.filter((p) => p !== activeProvider);
         if (failoverUsed || candidates.length === 0) {
           resolve(null);
           return;
@@ -554,6 +554,10 @@
       if (failoverChecked) { proceed(); return; }
       chrome.runtime.sendMessage({ type: 'FAILOVER_CHECK' }, (res) => {
         providersWithKeys = res?.providersWithKeys || [];
+        // Remember the primary so we never "switch" back onto the failing provider
+        if (!readPageState.currentProvider && res?.currentProvider) {
+          readPageState.currentProvider = res.currentProvider;
+        }
         failoverChecked = true;
         proceed();
       });
