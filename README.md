@@ -1,79 +1,118 @@
-# Hanna
+<div align="center">
 
-Read beautifully. A Chrome extension that reads text aloud using AI voices — with voice design, voice cloning, and a library of premium voices.
+# 🎧 Hanna
 
-## Setup
+**Read the web aloud with natural AI voices — and follow along, word by word.**
 
-1. Open `chrome://extensions` → enable **Developer mode**
-2. Click **Load unpacked** → select the `extension/` folder
-3. Click the Hanna icon → select a provider → enter your API key → hit **Test Connection**
+A Chrome extension that turns any article into a listening experience: karaoke-style
+highlighting, designed or cloned voices, full-page reading that skips the clutter.
 
-## How to use
+[Features](#-features) · [Quick start](#-quick-start) · [Providers](#-providers) · [How it works](#-how-it-works) · [Privacy](PRIVACY.md)
 
-**Read selected text:**
-Select text → right-click → **Hanna: Speak**
+</div>
 
-**Read entire page:**
-Right-click anywhere → **Hanna: Read page**
+---
 
-**Stop playback:**
-Press **Escape** or click **✕** on the indicator
+## ✨ Features
 
-**Playback controls:**
-- Click the indicator to pause/resume
-- Click the speed button to cycle: 1× → 1.25× → 1.5× → 1.75× → 2× → 3×
-- Karaoke highlighting follows along as text is read
+### Two ways to listen
 
-## Providers
+| | |
+|---|---|
+| **Speak** — highlight any text, right-click, hear it instantly | **Read Page** — one click reads the entire article top to bottom, automatically skipping menus, ads, and page chrome |
 
-| Provider | Preset Voices | Voice Design | Voice Clone | Models |
-|----------|:-------------:|:------------:|:-----------:|--------|
-| **MiMo TTS** | ✅ | ✅ | ✅ | mimo-v2.5-tts |
-| **ElevenLabs** | ✅ | — | ✅ | eleven_multilingual_v2 |
-| **Fish Audio** | ✅ | — | ✅ | s2.1-pro-free, s2.1-pro, s2.1-lite |
+### Karaoke highlighting
 
-### MiMo TTS
-- **Preset voices** — 28 curated voices across Professional, Expressive, Youthful, Character, and Accent categories
-- **Voice design** — describe a voice in words ("a warm Australian female with a soothing tone") or pick from 28 design presets
-- **Voice clone** — upload an audio clip (MP3, WAV, WebM, OGG, M4A, max 5MB)
+Words light up as they're spoken, with auto-scroll keeping the current word centred.
+Works on English and Chinese text alike.
 
-### ElevenLabs
-- **Preset voices** — 16 premium voices (7 female, 9 male)
-- **Voice clone** — upload a voice sample, get a voice ID back
+### Voices, your way
 
-### Fish Audio
-- **Preset voices** — 13 voices across General, Narrator, and Character categories
-- **Voice clone** — upload a voice sample with a custom name
-- **Model selection** — choose between free (s2.1-pro-free), paid (s2.1-pro), or fast (s2.1-lite)
+- **28 preset voices** — professional, expressive, character styles and more
+- **Voice design** — describe any voice in words: *"a warm Australian female with a soothing tone"*
+- **Voice cloning** — upload a sample clip; Hanna reads in that voice
+- Speed control from 1× to 3× with natural pitch preservation
 
-## Architecture
+### Built for real reading sessions
+
+- **Gapless playback** — upcoming paragraphs are fetched ahead while you listen
+- **Provider failover** — if a TTS provider fails mid-article, Hanna switches to your backup and keeps reading
+- **Smart caching** — repeated reads don't re-hit the API
+- **Graceful everywhere** — clean messages on pages without articles, rate limits, or network drops
+
+## 🚀 Quick start
+
+1. Clone or download this repository
+2. Open `chrome://extensions`, enable **Developer mode**
+3. Click **Load unpacked** and select the `extension/` folder
+4. Click the Hanna icon → pick a provider → paste your API key → **Test Connection**
+5. Select some text, right-click → **Hanna: Speak** 🎉
+
+> You'll need an API key from at least one provider (see below). Fish Audio has a free model.
+
+## 🔌 Providers
+
+| Provider | Presets | Voice Design | Cloning | Notes |
+|---|:-:|:-:|:-:|---|
+| **MiMo TTS** (Xiaomi) | 28 | ✅ | ✅ | Cantonese-capable dialect tags |
+| **Fish Audio** | 13 | — | ✅ | Free tier available (`s2.1-pro-free`) |
+| **ElevenLabs** | 16 | — | ✅ | Multilingual v2 model |
+
+Hanna is *bring-your-own-key*: you configure providers directly, keys never leave your browser.
+
+## 🧠 How it works
+
+```text
+Right-click → "Hanna: Speak" / "Hanna: Read Page"
+      ↓
+content.js extracts the text (bundled Readability.js for Read Page)
+      ↓
+long paragraphs split into sentence-bounded chunks (~900 chars)
+      ↓
+background.js requests audio from your chosen provider
+   - rolling prefetch + eager warmup keep playback gapless
+   - provider failover kicks in after repeated failures
+      ↓
+content.js plays audio with word-level highlighting
+```
+
+## 🛠 Development
+
+```bash
+npm install
+npm test        # run the test suite (Vitest + jsdom)
+```
+
+Tests cover the tricky pure logic: text tokenisation (CJK-aware), sentence-bounded
+chunking, typographic-character normalisation, karaoke wrapping, cache keys, and the
+byline/junk filters. CI runs them on every push.
+
+Project layout:
 
 ```
-Right-click → "Hanna: Speak" / "Hanna: Read page"
-  → background.js ensures content script is injected
-  → TTS request to MiMo / ElevenLabs / Fish Audio API
-  → audio returned to content.js
-  → content.js plays with karaoke highlighting
+extension/
+├── manifest.json       MV3 manifest
+├── background.js       TTS requests, caching, failover, injection
+├── content.js          extraction, playback, karaoke, pill UI
+├── Readability.js      bundled Mozilla reader-mode library
+├── utils.js            shared constants & voice presets
+└── sidepanel/          settings & provider management UI
+tests/                  Vitest suite (48 tests)
 ```
 
-No local server. No external dependencies. Just the extension.
-
-## Tech Stack
-
-- Chrome Extension (Manifest V3)
-- MiMo TTS v2.5 (Xiaomi) — preset, voice design, voice clone
-- ElevenLabs API — TTS, voice cloning, voice library
-- Fish Audio API — TTS, voice cloning, model selection
-- Vanilla JS — no frameworks, no build step
-
-## Storage
-
-- **Settings** — `chrome.storage.sync` (syncs across devices)
-- **API keys & voice clones** — `chrome.storage.local` (unlimited storage)
-- **TTS cache** — `chrome.storage.session` (survives service worker restarts, clears on browser close)
-
-## Keyboard Shortcuts
+## ⌨️ Shortcuts
 
 | Key | Action |
-|-----|--------|
-| **Escape** | Stop playback |
+|---|---|
+| `Esc` | Stop playback |
+| Click pill | Pause / resume |
+| Click speed chip | Cycle 1× → 3× |
+
+## 🔒 Privacy
+
+No analytics, no accounts, no servers. Text goes directly from your browser to the TTS
+provider you configure; API keys stay in local storage. See [PRIVACY.md](PRIVACY.md).
+
+## 📄 License
+
+MIT
