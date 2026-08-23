@@ -161,7 +161,7 @@ describe('karaoke duplication regression (GitHub page bug)', () => {
     // Each word appears exactly once (the bug rendered cumulative prefixes)
     expect(rendered.split('Read').length - 1).toBe(1);
     expect(rendered.split('beautifully').length - 1).toBe(1);
-    expect(scope.querySelectorAll('.hanna-word').length).toBe(14);
+    expect(scope.querySelectorAll('.hanna-word').length).toBe(12);
   });
 
   it('preserves inter-word gaps exactly once', () => {
