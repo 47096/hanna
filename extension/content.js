@@ -517,6 +517,12 @@
     speed: 1.0,
     active: false,
   };
+  // Failover state — when the primary provider fails repeatedly mid-session,
+  // switch to the next provider that has a key. One switch per session max.
+  let failoverProvider = null;   // null = using primary
+  let failoverUsed = false;
+  let failoverChecked = false;
+  let providersWithKeys = [];
   // Rolling prefetch — chunks are fetched ahead of playback so reading never
   // stalls mid-page. PREFETCH_AHEAD chunks stay in flight beyond the current
   // index; WARMUP_AHEAD of them are launched eagerly at session start (the
@@ -526,6 +532,34 @@
   let warmupDone = false;        // eager warmup runs once per page load
   let prefetchMap = new Map();   // index → { index, audioBase64, mimeType } | { failed: true }
   let prefetchInFlight = new Set();
+
+  // Ask background which providers have API keys, then pick the first one
+  // that isn't the current provider
+  function attemptFailover() {
+    return new Promise((resolve) => {
+      const proceed = () => {
+        const primary = failoverProvider || 'mimo'; // approximate current; refine below
+        const candidates = providersWithKeys.filter((p) => p !== readPageState.currentProvider);
+        if (failoverUsed || candidates.length === 0) {
+          resolve(null);
+          return;
+        }
+        failoverUsed = true;
+        failoverProvider = candidates[0];
+        readPageState.currentProvider = failoverProvider;
+        prefetchMap.clear();   // in-flight chunks belong to the dead provider
+        prefetchInFlight.clear();
+        showIndicator('loading', `Switching to ${failoverProvider}…`);
+        resolve(failoverProvider);
+      };
+      if (failoverChecked) { proceed(); return; }
+      chrome.runtime.sendMessage({ type: 'FAILOVER_CHECK' }, (res) => {
+        providersWithKeys = res?.providersWithKeys || [];
+        failoverChecked = true;
+        proceed();
+      });
+    });
+  }
 
   function fetchParagraphAudio(text, index) {
     return new Promise((resolve) => {
@@ -537,8 +571,11 @@
         return;
       }
       const myGen = speakGeneration;  // Capture generation for stale check
+      const msgPayload = { type: 'TTS_REQUEST', text };
+      // Failover: route this request to the switched provider
+      if (failoverProvider) msgPayload.failoverProvider = failoverProvider;
       chrome.runtime.sendMessage(
-        { type: 'TTS_REQUEST', text },
+        msgPayload,
         (response) => {
           // Stale response — readPage was stopped or restarted
           if (myGen !== speakGeneration || !readPageState.active) {
@@ -631,7 +668,11 @@
       speed: SPEED_PRESETS[currentSpeedIndex],
       active: true,
       consecutiveFailures: 0,
+      currentProvider: null,  // resolved from settings on first fetch
     };
+    // Fresh session — failover resets (per-session, not sticky by design)
+    failoverProvider = null;
+    failoverUsed = false;
     prefetchMap.clear();
     prefetchInFlight.clear();
 
@@ -676,17 +717,36 @@
     showIndicator('loading');
 
     if (prefetched && prefetched.failed) {
-      // Prefetch already failed for this segment — count it and move on
-      readPageState.consecutiveFailures = (readPageState.consecutiveFailures || 0) + 1;
-      if (readPageState.consecutiveFailures >= 2) {
-        readPageState.active = false;
-        prefetchMap.clear();
-        prefetchInFlight.clear();
-        showIndicator('error', 'Multiple failures — stopping');
-        return;
-      }
-      readPageState.currentIndex++;
-      readNextParagraph();
+      // Prefetch already failed for this segment. Before counting a failure,
+      // try switching providers — one switch per session.
+      attemptFailover().then((switched) => {
+        if (!readPageState.active) return;
+        if (switched) {
+          // Provider switched — retry THIS segment on the new provider
+          fetchParagraphAudio(currentText, readPageState.currentIndex).then((result) => {
+            if (!readPageState.active) return;
+            if (!result) {
+              showIndicator('error', 'Failover provider also failed — stopping');
+              readPageState.active = false;
+              return;
+            }
+            readPageState.consecutiveFailures = 0;
+            playCurrentParagraph(result.audioBase64, result.mimeType, currentText);
+          });
+          return;
+        }
+        // No failover available — count and continue/stops as before
+        readPageState.consecutiveFailures = (readPageState.consecutiveFailures || 0) + 1;
+        if (readPageState.consecutiveFailures >= 2) {
+          readPageState.active = false;
+          prefetchMap.clear();
+          prefetchInFlight.clear();
+          showIndicator('error', 'Multiple failures — stopping');
+          return;
+        }
+        readPageState.currentIndex++;
+        readNextParagraph();
+      });
       return;
     }
 
@@ -697,13 +757,23 @@
 
       if (!result) {
         // Skip-and-continue: advance to the next segment; only give up after
-        // 2 consecutive failures so one bad segment never kills the session
+        // 2 consecutive failures so one bad segment never kills the session.
+        // On 2nd failure, try switching providers before giving up entirely.
         readPageState.consecutiveFailures = (readPageState.consecutiveFailures || 0) + 1;
         if (readPageState.consecutiveFailures >= 2) {
-          readPageState.active = false;
-          prefetchMap.clear();
-          prefetchInFlight.clear();
-          showIndicator('error', 'Multiple failures — stopping');
+          attemptFailover().then((switched) => {
+            if (!readPageState.active) return;
+            if (!switched) {
+              readPageState.active = false;
+              prefetchMap.clear();
+              prefetchInFlight.clear();
+              showIndicator('error', 'Multiple failures — stopping');
+              return;
+            }
+            // Switched — stay on this segment and retry with new provider
+            readPageState.consecutiveFailures = 0;
+            readNextParagraph();
+          });
           return;
         }
         // Skip this segment and continue

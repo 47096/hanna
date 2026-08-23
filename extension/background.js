@@ -99,7 +99,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'TTS_REQUEST') {
     (async () => {
       try {
-        const audioData = await handleTTS(msg.text);
+        const overrides = msg.failoverProvider ? { failoverProvider: msg.failoverProvider } : null;
+        const audioData = await handleTTS(msg.text, overrides);
         sendResponse(audioData);
       } catch (err) {
         console.error('[Hanna] TTS error:', err.message);
@@ -107,6 +108,23 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       }
     })();
     return true; // async
+  }
+  // Failover support — report which providers have keys configured so the
+  // content script knows where it can switch to when the current one fails
+  if (msg.type === 'FAILOVER_CHECK') {
+    (async () => {
+      try {
+        const settings = await getSettings();
+        const providersWithKeys = [];
+        if (settings.mimoApiKey) providersWithKeys.push('mimo');
+        if (settings.fishApiKey) providersWithKeys.push('fish');
+        if (settings.elevenlabsApiKey) providersWithKeys.push('elevenlabs');
+        sendResponse({ providersWithKeys });
+      } catch (err) {
+        sendResponse({ providersWithKeys: [] });
+      }
+    })();
+    return true;
   }
   if (msg.type === 'TEST_TTS') {
     (async () => {
@@ -264,7 +282,11 @@ async function handleTTS(text, overrides = null) {
     throw new Error('Hanna is disabled');
   }
 
-  const provider = settings.provider || DEFAULT_PROVIDER;
+  // Failover: caller may override which provider handles this request
+  const provider = overrides?.failoverProvider || settings.provider || DEFAULT_PROVIDER;
+  if (overrides?.failoverProvider) {
+    settings.provider = overrides.failoverProvider;
+  }
 
   // Voice clone audio is stored in local storage (large data — don't pass via message)
   if (provider === 'mimo' && (!overrides || overrides.voiceMode === 'clone')) {
