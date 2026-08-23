@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Hanna",
+  "version": "1.0.0",
+  "minimum_chrome_version": "114",
+  "description": "Read beautifully. TTS with voice design and cloning via MiMo, ElevenLabs, and Fish Audio.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "unlimitedStorage",
+    "contextMenus",
+    "scripting",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://*.xiaomimimo.com/*",
+    "https://api.elevenlabs.io/*",
+    "https://api.fish.audio/*"
+  ],
+  "action": {
+    "default_title": "Hanna",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel/index.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

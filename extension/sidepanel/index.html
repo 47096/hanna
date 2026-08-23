@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div>
+        <div class="tagline">READ BEAUTIFULLY</div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-settings" class="btn-icon-only" title="Settings">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-enabled" checked aria-label="Enable Hanna">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </header>
+
+    <!-- Status toast -->
+    <div id="status" class="status hidden"></div>
+
+    <!-- ═══ MAIN VIEW ═══ -->
+    <div id="main-view">
+
+      <!-- Provider -->
+      <div class="section">
+        <div class="provider-tabs">
+          <button class="provider-tab active" data-provider="mimo">Xiaomi MiMo</button>
+          <button class="provider-tab" data-provider="elevenlabs">ElevenLabs</button>
+          <button class="provider-tab" data-provider="fish">Fish</button>
+        </div>
+      </div>
+
+      <!-- ── MiMo ── -->
+      <div id="mimo-main" class="section">
+        <!-- Voice mode switcher -->
+        <div class="voice-mode-row">
+          <button class="voice-mode active" data-mode="preset">Preset</button>
+          <button class="voice-mode" data-mode="design">Design</button>
+          <button class="voice-mode" data-mode="clone">Clone</button>
+        </div>
+
+        <!-- Preset -->
+        <div id="mode-preset" class="mode-panel">
+          <select id="mimo-preset-voice" class="input-underline" aria-label="MiMo preset voice">
+            <optgroup label="Professional">
+              <option value="confident-f" selected>Confident Female</option>
+              <option value="corporate-f">Corporate Female</option>
+              <option value="educator-f">Educator Female</option>
+              <option value="news-m">News Anchor Male</option>
+              <option value="professional-m">Professional Male</option>
+              <option value="authoritative-m">Authoritative Male</option>
+              <option value="broadcast-m">Broadcast Male</option>
+              <option value="documentary-m">Documentary Male</option>
+            </optgroup>
+            <optgroup label="Expressive">
+              <option value="narrator-m">Narrator Male</option>
+              <option value="audiobook-f">Audiobook Female</option>
+              <option value="audiobook-m">Audiobook Male</option>
+              <option value="fierce-f">Fierce Female</option>
+              <option value="commanding-m">Commanding Male</option>
+            </optgroup>
+            <optgroup label="Youthful">
+              <option value="bright-f">Bright Female</option>
+              <option value="sweet-f">Sweet Female</option>
+              <option value="friendly-f">Friendly Female</option>
+              <option value="charming-m">Charming Male</option>
+            </optgroup>
+            <optgroup label="Character">
+              <option value="sultry-f">Sultry Female</option>
+              <option value="whisper-f">Whisper Female</option>
+              <option value="mysterious-m">Mysterious Male</option>
+              <option value="robot">Robotic Voice</option>
+              <option value="pirate-m">Pirate Male</option>
+            </optgroup>
+            <optgroup label="Accent">
+              <option value="aussie-f">Australian Female</option>
+              <option value="aussie-m">Australian Male</option>
+              <option value="brit-f">British Female</option>
+              <option value="brit-m">British Male</option>
+              <option value="irish-f">Irish Female</option>
+              <option value="southern-f">Southern US Female</option>
+            </optgroup>
+          </select>
+          <div id="mimo-preset-desc" class="preset-desc"></div>
+        </div>
+
+        <!-- Design -->
+        <div id="mode-design" class="mode-panel" style="display:none">
+          <select id="mimo-voice-preset" class="input-underline" aria-label="MiMo voice design">
+            <optgroup label="Professional">
+              <option value="A bold, confident female voice with authority and presence">Confident Female</option>
+              <option value="A polished, professional female voice for business presentations">Corporate Female</option>
+              <option value="A clear, patient female voice with an instructional quality">Educator Female</option>
+              <option value="A clear, professional news anchor voice">News Anchor Male</option>
+              <option value="A polished, corporate male voice for presentations">Professional Male</option>
+              <option value="A deep, authoritative male voice with crisp articulation">Authoritative Male</option>
+              <option value="A smooth, trustworthy male radio host voice">Broadcast Male</option>
+              <option value="A measured, thoughtful male voice with gravitas">Documentary Male</option>
+            </optgroup>
+            <optgroup label="Expressive">
+              <option value="A rich, cinematic audiobook narrator voice with deep resonance">Narrator Male</option>
+              <option value="A rich, expressive female voice with dramatic range">Audiobook Female</option>
+              <option value="A deep, immersive male voice with character acting ability">Audiobook Male</option>
+              <option value="A powerful, intense female voice with commanding presence">Fierce Female</option>
+              <option value="An authoritative, military-style male trailer voice">Commanding Male</option>
+            </optgroup>
+            <optgroup label="Youthful">
+              <option value="A young, energetic female voice with bubbly enthusiasm">Bright Female</option>
+              <option value="A cute, youthful, anime-inspired female voice">Sweet Female</option>
+              <option value="A cheerful, approachable female voice with a smile in the tone">Friendly Female</option>
+              <option value="A smooth, charismatic male voice with warmth and charm">Charming Male</option>
+            </optgroup>
+            <optgroup label="Character">
+              <option value="A deep, husky female voice with a smooth, velvety quality">Sultry Female</option>
+              <option value="A soft, intimate, ASMR-like female voice with breathy undertones">Whisper Female</option>
+              <option value="A low, enigmatic male voice with an air of secrecy">Mysterious Male</option>
+              <option value="A synthetic, monotone robotic voice with metallic undertones">Robotic Voice</option>
+              <option value="A rough, boisterous male voice with a theatrical pirate accent">Pirate Male</option>
+            </optgroup>
+            <optgroup label="Accent">
+              <option value="A friendly, warm female voice with a clear Australian accent">Australian Female</option>
+              <option value="A laid-back male voice with a broad Australian accent">Australian Male</option>
+              <option value="A refined, polished female voice with a posh British RP accent">British Female</option>
+              <option value="A distinguished, eloquent male voice with a classic British accent">British Male</option>
+              <option value="A warm, melodic female voice with a soft Irish lilt">Irish Female</option>
+              <option value="A sweet, drawling female voice with a gentle Southern American accent">Southern US Female</option>
+            </optgroup>
+          </select>
+          <textarea id="mimo-voice-description" class="input-underline textarea" rows="2"
+            placeholder="Or describe your own voice..." aria-label="Voice description"></textarea>
+        </div>
+
+        <!-- Clone -->
+        <div id="mode-clone" class="mode-panel" style="display:none">
+          <div class="upload-area" id="mimo-upload-area" tabindex="0" role="button" aria-label="Upload MiMo voice sample">
+            <input type="file" id="mimo-voice-file" accept="audio/*" hidden>
+            <div class="upload-content">
+              <div class="upload-text">Upload a voice to clone</div>
+              <div class="upload-hint">Any audio clip · MP3, WAV, WebM, OGG, M4A</div>
+            </div>
+          </div>
+          <div class="status-row">
+            <span id="mimo-voice-status" class="status-line"></span>
+            <button id="mimo-voice-clear" class="btn-clear" style="display:none">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ElevenLabs ── -->
+      <div id="elevenlabs-main" class="section" style="display:none">
+        <div class="voice-mode-row">
+          <button class="voice-mode-el active" data-mode="preset">Preset</button>
+          <button class="voice-mode-el" data-mode="clone">Clone</button>
+        </div>
+
+        <!-- Preset -->
+        <div id="el-mode-preset" class="mode-panel">
+          <select id="elevenlabs-preset" class="input-underline" aria-label="ElevenLabs preset voice">
+            <optgroup label="Female">
+              <option value="cgSgspJ2msm6clMCkdW9">Jessica — playful, bright, warm</option>
+              <option value="EXAVITQu4vr4xnSDxMaL">Sarah — mature, reassuring</option>
+              <option value="FGY2WhTYpPnrIDTdsKH5">Laura — quirky, enthusiastic</option>
+              <option value="Xb7hH8MSUJpSbSDYk0k2">Alice — clear, engaging</option>
+              <option value="XrExE9yKIg1WjnnlVkGX">Matilda — professional</option>
+              <option value="pFZP5JQG7iQjIQuC4Bku">Lily — velvety, warm</option>
+              <option value="hpp4J3VqNfWAUOO0d1Us">Bella — professional, bright</option>
+            </optgroup>
+            <optgroup label="Male">
+              <option value="pNInz6obpgDQGcFmaJgB">Adam — dominant, firm</option>
+              <option value="CwhRBWXzGAHq8TQ4Fs17">Roger — laid-back, casual</option>
+              <option value="IKne3meq5aSn9XLyUdCD">Charlie — deep, confident</option>
+              <option value="JBFqnCBsd6RMkjVDRZzb">George — warm, captivating</option>
+              <option value="nPczCjzI2devNBz1zQrb">Brian — deep, comforting</option>
+              <option value="onwK4e9ZLuTAKqWW03F9">Daniel — steady broadcaster</option>
+              <option value="iP95p4xoKVk53GoZ742B">Chris — charming, down-to-earth</option>
+              <option value="bIHbv24MWmeRgasZH58o">Will — relaxed optimist</option>
+              <option value="pqHfZKP75CvOlQylNhV4">Bill — wise, mature</option>
+            </optgroup>
+          </select>
+          <div id="el-preset-desc" class="preset-desc"></div>
+        </div>
+
+        <!-- Clone -->
+        <div id="el-mode-clone" class="mode-panel" style="display:none">
+          <div class="upload-area" id="el-upload-area" tabindex="0" role="button" aria-label="Upload ElevenLabs voice sample">
+            <input type="file" id="el-voice-file" accept="audio/*" hidden>
+            <div class="upload-content">
+              <div class="upload-text">Upload a voice to clone</div>
+              <div class="upload-hint">Any audio clip · MP3, WAV, WebM, OGG, M4A</div>
+            </div>
+          </div>
+          <div class="input-row" style="margin-top:6px">
+            <input type="text" id="el-voice-name" class="input-underline" placeholder="Voice name" aria-label="ElevenLabs clone voice name">
+            <button id="clone-voice" class="btn-inline-sm">CLONE</button>
+          </div>
+          <div class="status-row">
+            <span id="el-clone-status" class="status-line"></span>
+            <button id="el-voice-clear" class="btn-clear" style="display:none">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Fish ── -->
+      <div id="fish-main" class="section" style="display:none">
+        <div class="voice-mode-row">
+          <button class="voice-mode-fish active" data-mode="preset">Preset</button>
+          <button class="voice-mode-fish" data-mode="clone">Clone</button>
+        </div>
+
+        <!-- Preset -->
+        <div id="fish-mode-preset" class="mode-panel">
+          <select id="fish-voice-id" class="input-underline" aria-label="Fish Audio preset voice">
+            <optgroup label="General">
+              <option value="536d3a5e000945adb7038665781a4aca" selected>Ethan — default male</option>
+              <option value="933563129e564b19a115bedd57b7406a">Sarah — warm female</option>
+              <option value="bf322df2096a46f18c579d0baa36f41d">Adrian — clear male</option>
+              <option value="e3cd384158934cc9a01029cd7d278634">Laura — friendly female</option>
+              <option value="79d0bd3e4e5444b18f7b6d89b5927bf1">Jordan — conversational male</option>
+              <option value="9a9cf47702da476aa4629e2506d4a857">Hannah — natural female</option>
+            </optgroup>
+            <optgroup label="Narrator">
+              <option value="0327fdb5da9e4fd782899a8058c8ae2b">Narrator Max — deep voice</option>
+              <option value="5c8dc6a69c0b4edfb32634db6384bf34">Warm Storyteller</option>
+              <option value="542fc7aab61e4561bae5ebd536d717c0">Conversational Narrator</option>
+              <option value="5212eb29e500460391d03af42af6552e">Warm Conversational</option>
+            </optgroup>
+            <optgroup label="Character">
+              <option value="6ab4c6b0f37f4243a99046478647be94">Jade — expressive female</option>
+              <option value="7a18a1851d2649108c48ec9f2c80eb2c">Dramatic Male</option>
+              <option value="c2623f0c075b4492ac367989aee1576f">Paula — expressive female</option>
+            </optgroup>
+          </select>
+          <div id="fish-preset-desc" class="preset-desc"></div>
+          <input type="text" id="fish-voice-input" class="input-underline" placeholder="Or paste a Voice ID" style="margin-top:6px" aria-label="Fish Audio voice ID">
+          <div class="hint-text">Browse voices at <a href="https://fish.audio/app/discovery/" target="_blank">fish.audio</a></div>
+        </div>
+
+        <!-- Clone -->
+        <div id="fish-mode-clone" class="mode-panel" style="display:none">
+          <div class="upload-area" id="fish-upload-area" tabindex="0" role="button" aria-label="Upload Fish Audio voice sample">
+            <input type="file" id="fish-voice-file" accept="audio/*" hidden>
+            <div class="upload-content">
+              <div class="upload-text">Upload a voice to clone</div>
+              <div class="upload-hint">Any audio clip · MP3, WAV, WebM, OGG, M4A</div>
+            </div>
+          </div>
+          <div class="input-row" style="margin-top:6px">
+            <input type="text" id="fish-voice-name" class="input-underline" placeholder="Voice name" aria-label="Fish Audio clone voice name">
+            <button id="fish-clone-btn" class="btn-inline-sm">CLONE</button>
+          </div>
+          <div class="status-row">
+            <span id="fish-clone-status" class="status-line"></span>
+            <button id="fish-voice-clear" class="btn-clear" style="display:none">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Play Test -->
+      <div class="section">
+        <button id="test-btn" class="btn-main">PLAY</button>
+      </div>
+
+      <!-- Read Page -->
+      <div class="section">
+        <button id="read-page-btn" class="btn-main btn-secondary">READ PAGE</button>
+      </div>
+
+      <!-- No API key hint -->
+      <div id="no-key-hint" class="no-key-hint" style="display:none">
+        Add an API key in Settings to start
+      </div>
+
+      <!-- How to use -->
+      <div class="how-to">
+        <div class="how-to-title">QUICK START</div>
+        <div class="how-to-steps">
+          <div class="step"><span class="step-num">1</span> Highlight the text</div>
+          <div class="step"><span class="step-num">2</span> Right-click → <strong>Hanna: Speak</strong></div>
+          <div class="step"><span class="step-num">3</span> Click the status bar at the bottom right to pause/resume</div>
+          <div class="step"><span class="step-num">4</span> Or press <strong>READ PAGE</strong> to read the whole article</div>
+          <div class="step"><span class="step-num">5</span> Press <strong>Esc</strong> or <strong>✕</strong> anytime to stop</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS VIEW ═══ -->
+    <div id="settings-view" style="display:none">
+      <div class="settings-header">
+        <span class="settings-title">PROVIDERS</span>
+        <button id="btn-back" class="btn-icon-only" aria-label="Close settings">✕</button>
+      </div>
+
+      <!-- Step 1: Choose provider -->
+      <div class="step-header">
+        <div class="setup-step-num">1</div>
+        <div class="step-title">Choose a provider</div>
+      </div>
+      <div class="step-desc">Select which TTS service to use. You can switch anytime.</div>
+
+      <div class="provider-options">
+        <div class="provider-opt sel" data-settings="mimo-settings" tabindex="0" role="button" aria-label="Select Xiaomi MiMo">
+          <span class="provider-opt-icon">🍚</span>
+          <div class="provider-opt-info">
+            <div class="provider-opt-name">Xiaomi MiMo</div>
+            <div class="provider-opt-desc">Voice design, cloning, presets</div>
+          </div>
+        </div>
+        <div class="provider-opt" data-settings="elevenlabs-settings" tabindex="0" role="button" aria-label="Select ElevenLabs">
+          <span class="provider-opt-icon">🎙</span>
+          <div class="provider-opt-info">
+            <div class="provider-opt-name">ElevenLabs</div>
+            <div class="provider-opt-desc">Premium voices, cloning</div>
+          </div>
+        </div>
+        <div class="provider-opt" data-settings="fish-settings" tabindex="0" role="button" aria-label="Select Fish Audio">
+          <span class="provider-opt-icon">🐟</span>
+          <div class="provider-opt-info">
+            <div class="provider-opt-name">Fish Audio</div>
+            <div class="provider-opt-desc">Community voices</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="settings-divider">
+
+      <!-- Step 2: Configure -->
+      <div class="step-header">
+        <div class="setup-step-num">2</div>
+        <div class="step-title" id="configure-title">Configure Xiaomi MiMo</div>
+      </div>
+
+      <!-- MiMo settings -->
+      <div id="mimo-settings" class="settings-group">
+        <div class="field">
+          <div class="label">API KEY</div>
+          <div class="input-row">
+            <input type="password" id="mimo-api-key" class="input-underline" placeholder="Enter MiMo API key" aria-label="MiMo API key">
+            <button id="mimo-test-connection" class="btn-inline-sm">TEST</button>
+          </div>
+          <div id="mimo-connection-status" class="status-line"></div>
+          <div class="model-info">Model: mimo-v2.5-tts</div>
+        </div>
+        <div class="field">
+          <div class="label">PLAN</div>
+          <select id="mimo-base-url" class="input-underline" aria-label="MiMo plan">
+            <option value="https://token-plan-sgp.xiaomimimo.com">Token Plan — International</option>
+            <option value="https://token-plan-cn.xiaomimimo.com">Token Plan — China</option>
+            <option value="https://api.xiaomimimo.com">Pay-as-you-go</option>
+          </select>
+        </div>
+        <div class="how-to">
+          <div class="how-to-title">HOW TO GET YOUR API KEY</div>
+          <div class="how-to-steps">
+            <div class="step"><span class="step-num">1</span> Sign in at <a href="https://mimo.mi.com/" target="_blank">mimo.mi.com</a></div>
+            <div class="step"><span class="step-num">2</span> Click the API Keys or Token Plan tab</div>
+            <div class="step"><span class="step-num">3</span> Copy your API key and paste it above</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ElevenLabs settings -->
+      <div id="elevenlabs-settings" class="settings-group" style="display:none">
+        <div class="field">
+          <div class="label">API KEY</div>
+          <div class="input-row">
+            <input type="password" id="elevenlabs-api-key" class="input-underline" placeholder="Enter ElevenLabs API key" aria-label="ElevenLabs API key">
+            <button id="el-test-connection" class="btn-inline-sm">TEST</button>
+          </div>
+          <div id="el-connection-status" class="status-line"></div>
+          <div class="model-info">Model: eleven_multilingual_v2</div>
+        </div>
+        <div class="how-to">
+          <div class="how-to-title">HOW TO GET YOUR API KEY</div>
+          <div class="how-to-steps">
+            <div class="step"><span class="step-num">1</span> Sign in at <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a></div>
+            <div class="step"><span class="step-num">2</span> Click Developers in the sidebar → API Keys</div>
+            <div class="step"><span class="step-num">3</span> Copy your API key and paste it above</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fish settings -->
+      <div id="fish-settings" class="settings-group" style="display:none">
+        <div class="field">
+          <div class="label">API KEY</div>
+          <div class="input-row">
+            <input type="password" id="fish-api-key" class="input-underline" placeholder="Enter Fish Audio API key" aria-label="Fish Audio API key">
+            <button id="fish-test-connection" class="btn-inline-sm">TEST</button>
+          </div>
+          <div id="fish-connection-status" class="status-line"></div>
+        </div>
+        <div class="field">
+          <div class="label">MODEL</div>
+          <select id="fish-model" class="input-underline" aria-label="Fish Audio model">
+            <option value="s2.1-pro-free">s2.1-pro-free (Free)</option>
+            <option value="s2.1-pro">s2.1-pro (Paid)</option>
+            <option value="s2.1-lite">s2.1-lite (Fast)</option>
+          </select>
+        </div>
+        <div class="how-to">
+          <div class="how-to-title">HOW TO GET YOUR API KEY</div>
+          <div class="how-to-steps">
+            <div class="step"><span class="step-num">1</span> Sign in at <a href="https://fish.audio" target="_blank">fish.audio</a></div>
+            <div class="step"><span class="step-num">2</span> Click Developers in the sidebar → API Keys</div>
+            <div class="step"><span class="step-num">3</span> Copy your API key and paste it above</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../utils.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
