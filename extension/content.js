@@ -243,12 +243,11 @@
         // Wrap the RAW text (original characters preserved)
         const frag = document.createDocumentFragment();
 
-        if (rawStart > 0 && nodeIdx === startNodeIdx && wordIdx === 0) {
-          frag.appendChild(document.createTextNode(entry.raw.slice(0, rawStart)));
-        } else if (rawStart > 0) {
-          // text between words in the same node
-          const prevEnd = spans.length > 0 ? rawStart : rawStart;
-          frag.appendChild(document.createTextNode(entry.raw.slice(0, rawStart)));
+        // Leading gap = text between the previous span's end and this span's
+        // start. First span in the node: from node start to rawStart.
+        const prevConsumed = entry.node._pendingFrag ? entry.node._pendingFrag.consumed : 0;
+        if (rawStart > prevConsumed) {
+          frag.appendChild(document.createTextNode(entry.raw.slice(prevConsumed, rawStart)));
         }
 
         const span = document.createElement('span');
